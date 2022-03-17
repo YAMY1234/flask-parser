@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<!-- <html lang="en"> -->
+
+<head>
+    <meta charset="utf-8">
+    <title>Scanner, Parser and Semantic Analyzer </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='./d3.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='codemirror.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='mdn-like.css') }}" />
+    <script src="{{ url_for('static', filename='./codemirror.js') }}"></script>
+    <script src="{{ url_for('static', filename='./clike.js') }}"></script>
+</head>
+
+<body style="overflow: hidden">
+    <div id="container">
+        <div id="left">
+            <div class="tabs">
+
+                <!-- This is the first table, Which is the Scanner  result-->
+
+                <div class="tab">
+                    <input class="tab-radio" type="radio" id="tab-1" name="tab-group-1" checked>
+                    <label class="tab-label" for="tab-1"><span class="word-recipe">Parse Tree</span> 语法分析</label>
+                    <div class="tab-panel">
+                        <div class="tab-content" id="tree">
+                            <script>
+                                namelist =
+                                {
+                                    "PPT_declaration_class": "声明类型",
+                                    "PPT_declaration": "<声明>",
+                                    "PPT_variable_declaration": "变量声明",
+                                    "PPT_function_declaration": "函数声明",
+                                    "declaration_init_list": "声明初始化列表",
+                                    "function_declaration_suffix": "函数声明后缀",
+                                    "function_declaration_list": "函数声明列表",
+                                    "assignment_expression_profix": "函数表达式前缀",
+                                    "assignment_expression_list": "声明表达式/参数列表",
+
+                                    "expression_statement": "表达式语句",
+                                    "function_implement": "函数实现",
+                                    "iteration_statement": "while表达式语句",
+                                    "expression_profix": "表达式前缀",
+                                    "assignment_expression": "赋值表达式",
+                                    "external_declaration": "全局变量声明",
+                                    "type_specifier": "类型标识符",
+                                    "compound_statement": "复合表达式",
+                                    "selection_statement": "if-else表达式",
+                                    "constant_expression": "常量表达式",
+                                    "arithmetic_expression": "算数表达式",
+                                    "declaration_init": "声明前部",
+                                    "declaration_assign": "声明分配",
+                                    "jump_statement": "跳转语句",
+                                    "function_definition": "函数定义",
+                                    "function_declaration": "函数声明",
+                                    "expression_list": "表达式列表",
+                                    "assignment_operator": "赋值操作符",
+                                    "statement_list": "语句列表",
+                                    "function_expression": "函数表达式",
+                                    "primary_expression": "源表达式",
+
+                                    "expression": "表达式",
+                                    "operator": "操作符",
+                                    "start": "开始符",
+                                    "statement": "一般语句",
+                                    "declaration": "声明",
+                                    "IDENTIFIER": "标识符",
+                                    "&gt;": ">",
+                                    "&lt;": "<",
+                                    "shift": "移进",
+                                    "reduce": "归约",
+                                    "SEPERATOR": "分隔符",
+                                    "OPERATOR": "操作符"
+
+
+                                }
+
+                                function changeName(rawdata) {
+                                    for (var key in namelist) {
+                                        var item = namelist[key];
+                                        rawdata = rawdata.split(key).join(item);
+                                    }
+                                    return rawdata
+                                }
+                                var raw_data = "{{tokens}}";
+                                raw_data = raw_data.split("&#39;").join("\"");
+                                raw_data = changeName(raw_data)
+                                raw_data = eval('(' + raw_data + ')');
+                                Tokens = raw_data;
+
+                                var raw_data = "{{LR1}}";
+                                raw_data = raw_data.split("&#39;").join("\"");
+                                raw_data = eval('(' + raw_data + ')');
+                                LR1 = raw_data;
+
+                                var raw_data = "{{stackTB}}";
+                                raw_data = raw_data.split("&#39;").join("\'");
+                                raw_data = raw_data.split("&#34;").join("\"");
+                                raw_data = changeName(raw_data)
+                                raw_data = Function('"use strict";return (' + raw_data + ')')();
+                                stackTB = raw_data;
+
+                                var raw_data = "{{SemanticData}}";
+                                raw_data = raw_data.split("&#39;").join("\'");
+                                raw_data = raw_data.split("&#34;").join("\"");
+                                raw_data = changeName(raw_data)
+                                raw_data = Function('"use strict";return (' + raw_data + ')')();
+                                SemanticData = raw_data;
+
+                                var raw_data = "{{SemanticError}}";
+                                raw_data = raw_data.split("&#39;").join("\'");
+                                raw_data = raw_data.split("&#34;").join("\"");
+                                raw_data = changeName(raw_data)
+                                // raw_data = eval('(' + raw_data + ')');
+                                raw_data = Function('"use strict";return (' + raw_data + ')')();
+                                SemanticError = raw_data;
+
+                            </script>
+
+                            <!-- Load Tree View -->
+                            <!-- <script type="module" src="{{ url_for('static', filename='index_v3.js') }}"></script> -->
+                            <script>
+                                var raw_treedata = "{{treedata}}";
+                                raw_treedata = raw_treedata.split("&#39;").join("\"");
+                                raw_treedata = changeName(raw_treedata)
+                                raw_treedata = eval('(' + raw_treedata + ')');
+                                var treeData = [raw_treedata];
+
+                                // ************** Generate the tree diagram	 *****************
+                                var margin = { top: 2, right: 2, bottom: 2, left: 2 },
+                                    // width = 1200 - margin.right - margin.left,
+                                    width = 800 - margin.right - margin.left,
+                                    height = 550 - margin.top - margin.bottom;
+
+                                var i = 0,
+                                    duration = 500,//动画时间
+                                    root;
+
+                                var tree = d3.layout.tree()
+                                    // .size([targetHeight, targetWidth]);
+                                    .size([height * 1.7, width])
+                                    .nodeSize([30,])
+                                    .separation(function separation(a, b) {
+                                        return a.parent == b.parent ? 2 : 1;
+                                    });;
+
+                                var diagonal = d3.svg.diagonal()
+                                    .projection(function (d) { return [d.x, d.y]; });
+                                // .projection(function (d) { return [d.y, d.x]; });
+
+                                var svg = d3.select("#tree")
+                                    .append("svg")
+                                    .attr("preserveAspectRatio", "xMidYMid meet") // Responsive
+                                    .attr("viewBox", "0 0 " + width + " " + height)
+                                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                                    .call(d3.behavior.zoom().on("zoom", function () {
+                                        svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+                                    }))
+                                    .append("g")
+                                    ;
+
+                                root = treeData[0];
+                                root.x0 = height / 2;
+                                root.y0 = 0;
+
+                                update(root);
+
+                                d3.select(self.frameElement).style("height", "500px");
+
+                                function update(source) {
+
+                                    // Compute the new tree layout.
+                                    var nodes = tree.nodes(root).reverse(),
+                                        links = tree.links(nodes);
+
+                                    // Normalize for fixed-depth.
+                                    nodes.forEach(function (d) { d.y = d.depth * 120; });
+
+                                    // Update the nodes…
+                                    var node = svg.selectAll("g.node")
+                                        .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+                                    // Enter any new nodes at the parent's previous position.
+                                    var nodeEnter = node.enter().append("g")
+                                        .attr("class", "node")
+                                        // .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+                                        .attr("transform", function (d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
+                                        .on("click", click);//click on test or circle
+
+                                    nodeEnter.append("circle")
+                                        .attr("r", 1e-6)
+                                        .style("fill", function (d) { return d._children ? "lightsteelblue" : "#fff"; })
+                                        // 添加mouseover事件 => only on circle
+                                        .on("mouseover", d => {
+                                            // 从d3.event获取鼠标的位置
+                                            var transform = d3.event;
+                                            var yPosition = transform.offsetY + 4;
+                                            var xPosition = transform.offsetX / 1.7 + 4;
+
+                                            // 将浮层位置设置为鼠标位置
+                                            var chartTooltip = d3
+                                                .select(".chartTooltip")
+                                                .style("left", -400 + "px")
+                                                .style("top", 100 + "px");
+                                            // .style("left", xPosition + "px")
+                                            // .style("top", yPosition + "px");
+
+                                            // 更新浮层内容
+                                            chartTooltip.select(".name").text("鼠标所指的节点是: " + d.name);
+
+                                            // 移除浮层hidden样式，展示浮层
+                                            chartTooltip.classed("hidden", false);
+                                        })
+                                        // 添加mouseover事件
+                                        .on("mouseout", () => {
+                                            // 添加浮层hidden样式，隐藏浮层
+                                            d3.select(".chartTooltip").classed("hidden", true);
+                                        });;
+                                    //* This is the vertical version
+                                    nodeEnter.append("text")
+                                        .attr("y", function (d) {
+                                            return d.children || d._children ? -18 : 18;
+                                        })
+                                        .attr("dy", ".35em")
+                                        .attr("text-anchor", "middle")
+                                        .text(function (d) { return d.name; })
+                                        .attr("transform", function (d) {
+                                            if (d.name.length > 6) {
+                                                return "rotate(20)";
+                                            }
+                                            else {
+                                                return "translate(0,0)";
+                                            }
+                                        })
+                                        .style("fill-opacity", 1);
+
+
+                                    // Transition nodes to their new position.
+                                    var nodeUpdate = node.transition()
+                                        .duration(duration)
+                                        // .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; });
+                                        .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+                                    nodeUpdate.select("circle")
+                                        .attr("r", 10)
+                                        .style("fill", function (d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+                                    nodeUpdate.select("text")
+                                        .style("fill-opacity", 1);
+
+                                    // Transition exiting nodes to the parent's new position.
+                                    var nodeExit = node.exit().transition()
+                                        .duration(duration)
+                                        // .attr("transform", function (d) { return "translate(" + source.y + "," + source.x + ")"; })
+                                        .attr("transform", function (d) { return "translate(" + source.x + "," + source.y + ")"; })
+                                        .remove();
+
+                                    nodeExit.select("circle")
+                                        .attr("r", 1e-6);
+
+                                    nodeExit.select("text")
+                                        .style("fill-opacity", 1e-6);
+
+                                    // Update the links…
+                                    var link = svg.selectAll("path.link")
+                                        .data(links, function (d) { return d.target.id; });
+
+                                    // Enter any new links at the parent's previous position.
+                                    link.enter().insert("path", "g")
+                                        .attr("class", "link")
+                                        .attr("d", function (d) {
+                                            var o = { x: source.x0, y: source.y0 };
+                                            return diagonal({ source: o, target: o });
+                                        });
+
+                                    // Transition links to their new position.
+                                    link.transition()
+                                        .duration(duration)
+                                        .attr("d", diagonal);
+
+                                    // Transition exiting nodes to the parent's new position.
+                                    link.exit().transition()
+                                        .duration(duration)
+                                        .attr("d", function (d) {
+                                            var o = { x: source.x, y: source.y };
+                                            return diagonal({ source: o, target: o });
+                                        })
+                                        .remove();
+
+                                    // Stash the old positions for transition.
+                                    nodes.forEach(function (d) {
+                                        d.x0 = d.x;
+                                        d.y0 = d.y;
+                                    });
+                                }
+
+                                // Toggle children on click.
+                                function click(d) {
+                                    if (d.children) {
+                                        d._children = d.children;
+                                        d.children = null;
+                                    } else {
+                                        d.children = d._children;
+                                        d._children = null;
+                                    }
+                                    update(d);
+                                }
+
+                            </script>
+                            <div class="chartTooltip hidden">
+                                <p>
+                                    <strong class="name"></strong>
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- This is the second table, Which is the Lexical Analysis result-->
+
+                <div class="tab">
+                    <input class="tab-radio" type="radio" id="tab-2" name="tab-group-1">
+                    <label class="tab-label" for="tab-2"><span class="word-recipe">Lexical Analysis</span> 词法分析</label>
+
+                    <div class="tab-panel">
+                        <div class="tab-content" id="tokenTableDiv">
+                            <table id="tokenTable">
+                            </table>
+                            <script>
+                                // Load Token Data
+                                // Tokens = [{   }]
+                                Tokens = Tokens
+                                $(document).ready(function () {
+                                    //生成表格内容
+                                    let scrollTable = '';
+                                    scrollTable += '<tr>';
+                                    scrollTable += '   <th>No</th>';
+                                    scrollTable += '   <th>Type</th>';
+                                    scrollTable += '   <th>Value</th>';
+                                    scrollTable += '</tr>';
+
+                                    for (let i = 0; i < Tokens.length; i++) {
+                                        scrollTable += '<tr>';
+                                        scrollTable += `<td>${i + 1}</td>`;
+                                        scrollTable += `<td>${Tokens[i].name}</td>`;
+                                        scrollTable += `<td>${Tokens[i].data}</td>`;
+                                        scrollTable += '</tr>';
+                                    }
+
+                                    $('#tokenTable').html(scrollTable);
+                                    $('#tokenTableDiv').on('scroll', function () {
+                                        let top = $(this).scrollTop();
+                                        $('#tokenTableDiv').scrollTop(top);
+                                    })
+                                }
+                                )
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- This is the third table, Which is the action Goto table-->
+                <div class="tab">
+                    <input class="tab-radio" type="radio" id="tab-3" name="tab-group-1" checked>
+                    <label class="tab-label" for="tab-3"><span class="word-recipe">LR(1)</span>ACTION+GOTO</label>
+                    <div class="tab-panel">
+                        <div class="tab-content" id="parserTableDiv">
+                            <table id="parserTable">
+                            </table>
+                            <script>
+                                LR1 = LR1;
+                                $(document).ready(function () {
+                                    //生成表格内容
+                                    let scrollTable = '';
+                                    scrollTable += '<tr>';
+                                    scrollTable += '<th>State</th>';
+                                    scrollTable += '<th>!=</th>';
+                                    scrollTable += '<th>#</th>';
+                                    scrollTable += '<th>$</th>';
+                                    scrollTable += '<th>%</th>';
+                                    scrollTable += '<th>&gt;</th>';
+                                    scrollTable += '<th>&gt;=</th>';
+                                    scrollTable += '<th>&lt;</th>';
+                                    scrollTable += '<th>&lt;=</th>';
+                                    scrollTable += '<th>(</th>';
+                                    scrollTable += '<th>)</th>';
+                                    scrollTable += '<th>*</th>';
+                                    scrollTable += '<th>+</th>';
+                                    scrollTable += '<th>,</th>';
+                                    scrollTable += '<th>-</th>';
+                                    scrollTable += '<th>/</th>';
+                                    scrollTable += '<th>;</th>';
+                                    scrollTable += '<th>=</th>';
+                                    scrollTable += '<th>==</th>';
+                                    scrollTable += '<th>CHAR</th>';
+                                    scrollTable += '<th>IDENTIFIER</th>';
+
+
+                                    scrollTable += '<th>break</th>';
+                                    scrollTable += '<th>char</th>';
+                                    scrollTable += '<th>continue</th>';
+                                    scrollTable += '<th>else</th>';
+                                    scrollTable += '<th>float</th>';
+                                    scrollTable += '<th>for</th>';
+                                    scrollTable += '<th>if</th>';
+                                    scrollTable += '<th>int</th>';
+                                    scrollTable += '<th>number</th>';
+                                    scrollTable += '<th>return</th>';
+                                    scrollTable += '<th>while</th>';
+                                    scrollTable += '<th>{</th>';
+                                    scrollTable += '<th>}</th>';
+
+
+                                    scrollTable += '<th>assignment_operator</th>';
+                                    scrollTable += '<th>operator</th>';
+                                    scrollTable += '<th>arithmetic_expression</th>';
+                                    scrollTable += '<th>assignment_expression</th>';
+                                    scrollTable += '<th>assignment_expression_list</th>';
+                                    scrollTable += '<th>assignment_expression_profix</th>';
+                                    scrollTable += '<th>compound_statement</th>';
+                                    scrollTable += '<th>constant_expression</th>';
+                                    scrollTable += '<th>declaration</th>';
+                                    scrollTable += '<th>declaration_assign</th>';
+                                    scrollTable += '<th>declaration_init</th>';
+                                    scrollTable += '<th>declaration_init_list</th>';
+                                    scrollTable += '<th>expression</th>';
+                                    scrollTable += '<th>expression_list</th>';
+                                    scrollTable += '<th>expression_profix</th>';
+                                    scrollTable += '<th>expression_statement</th>';
+                                    scrollTable += '<th>external_declaration</th>';
+                                    scrollTable += '<th>function_declaration</th>';
+                                    scrollTable += '<th>function_declaration_list</th>';
+                                    scrollTable += '<th>function_declaration_suffix</th>';
+                                    scrollTable += '<th>function_definition</th>';
+                                    scrollTable += '<th>function_expression</th>';
+                                    scrollTable += '<th>iteration_statement</th>';
+                                    scrollTable += '<th>jump_statement</th>';
+                                    scrollTable += '<th>primary_expression</th>';
+                                    scrollTable += '<th>selection_statement</th>';
+                                    scrollTable += '<th>start</th>';
+                                    scrollTable += '<th>statement</th>';
+                                    scrollTable += '<th>statement_list</th>';
+                                    scrollTable += '<th>type_specifier</th>';
+                                    scrollTable += '</tr>';
+
+                                    for (let i = 0; i < LR1.length; i++) {
+                                        scrollTable += '<tr>';
+                                        scrollTable += `<td>${i}</td>`;
+                                        scrollTable += `<td>${LR1[i]['!=']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['#']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['$']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['%']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['&gt;']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['&gt;=']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['&lt;']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['&lt;=']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['(']}</td>`;
+                                        scrollTable += `<td>${LR1[i][')']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['*']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['+']}</td>`;
+                                        scrollTable += `<td>${LR1[i][',']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['-']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['/']}</td>`;
+                                        scrollTable += `<td>${LR1[i][';']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['=']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['==']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['CHAR']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['IDENTIFIER']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['break']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['char']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['continue']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['else']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['float']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['for']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['if']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['int']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['number']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['return']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['while']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['{']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['}']}</td>`;
+
+
+
+                                        scrollTable += `<td>${LR1[i]['assignment_operator']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['operator']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['arithmetic_expression']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['assignment_expression']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['assignment_expression_list']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['assignment_expression_profix']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['compound_statement']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['constant_expression']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['declaration']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['declaration_assign']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['declaration_init']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['declaration_init_list']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['expression']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['expression_list']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['expression_profix']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['expression_statement']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['external_declaration']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['function_declaration']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['function_declaration_list']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['function_declaration_suffix']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['function_definition']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['function_expression']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['iteration_statement']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['jump_statement']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['primary_expression']}</td>`;
+
+                                        scrollTable += `<td>${LR1[i]['selection_statement']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['start']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['statement']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['statement_list']}</td>`;
+                                        scrollTable += `<td>${LR1[i]['type_specifier']}</td>`;
+
+                                        scrollTable += '</tr>';
+                                    }
+
+                                    $('#parserTable').html(scrollTable);
+                                    $('#parserTableDiv').on('scroll', function () {
+                                        let top = $(this).scrollTop();
+                                        $('#parserTableDiv').scrollTop(top);
+                                    })
+                                }
+                                )
+                            </script>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- This is the fourth table, which is the Parsing process info-->
+                <div class="tab">
+                    <input class="tab-radio" type="radio" id="tab-4" name="tab-group-1" checked>
+                    <label class="tab-label" for="tab-4"><span class="word-recipe">parsing</span> Stack</label>
+                    <div class="tab-panel">
+                        <div class="tab-content" id="parsingStackDiv">
+                            <table id="parsingStack">
+                            </table>
+                            <script>
+                                stackTB = stackTB;
+                                $(document).ready(function () {
+                                    //生成表格内容
+                                    let scrollTable = '';
+                                    scrollTable += '<tr>';
+
+                                    scrollTable += '<th>步骤</th>';
+                                    scrollTable += '<th>当前栈</th>';
+                                    scrollTable += '<th>输入串</th>';
+                                    scrollTable += '<th>动作</th>';
+                                    scrollTable += '<th>状态栈</th>';
+                                    scrollTable += '<th>ACTION</th>';
+                                    scrollTable += '<th>GOTO</th>';
+
+
+                                    scrollTable += '</tr>';
+
+                                    for (let i = 0; i < stackTB.length; i++) {
+                                        scrollTable += '<tr>';
+
+                                        scrollTable += `<td nowrap="nowrap">${stackTB[i]['步骤']}</td>`;
+                                        scrollTable += `<td nowrap="nowrap">${stackTB[i]['当前栈']}</td>`;
+                                        scrollTable += `<td nowrap="nowrap">${stackTB[i]['输入串']}</td>`;
+                                        scrollTable += `<td nowrap="nowrap">${stackTB[i]['动作']}</td>`;
+                                        scrollTable += `<td nowrap="nowrap">${stackTB[i]['状态栈']}</td>`;
+                                        scrollTable += `<td nowrap="nowrap">${stackTB[i]['ACTION']}</td>`;
+                                        scrollTable += `<td nowrap="nowrap">${stackTB[i]['GOTO']}</td>`;
+
+                                        scrollTable += '</tr>';
+                                    }
+
+                                    $('#parsingStack').html(scrollTable);
+                                    $('#parsingStackDiv').on('scroll', function () {
+                                        let top = $(this).scrollTop();
+                                        $('#parsingStackDiv').scrollTop(top);
+                                    })
+                                }
+                                )
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <!-- This is the fifth table, which is the Semantic Analysis Result-->
+                <div class="tab">
+                    <input class="tab-radio" type="radio" id="tab-5" name="tab-group-1" checked>
+                    <label class="tab-label" for="tab-5"><span class="word-recipe">Semantic Analysis</span> 语义分析</label>
+                    <div class="tab-panel">
+                        <div class="tab-content" id="semanticTableDiv">
+                            <table id="SemanticTable">
+                            </table>
+                            <script>
+                                SemanticData = SemanticData;
+                                $(document).ready(function () {
+                                    //生成表格内容
+                                    let scrollTable = '';
+                                    scrollTable += '<tr>';
+                                    scrollTable += '<th>No</th>';
+                                    scrollTable += '<th>四元式</th>';
+                                    scrollTable += '</tr>';
+
+                                    for (let i = 0; i < SemanticData.length; i++) {
+                                        scrollTable += '<tr>';
+                                        scrollTable += `<td nowrap="nowrap">${i}</td>`;
+                                        scrollTable += `<td nowrap="nowrap">${SemanticData[i]}</td>`;
+                                        scrollTable += '</tr>';
+                                    }
+
+                                    $('#SemanticTable').html(scrollTable);
+                                    $('#semanticTableDiv').on('scroll', function () {
+                                        let top = $(this).scrollTop();
+                                        $('#semanticTableDiv').scrollTop(top);
+                                    })
+                                }
+                                )
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <!-- This is the sixth table, which displays the Semantic Errors -->
+                <div class="tab">
+                    <input class="tab-radio" type="radio" id="tab-6" name="tab-group-1" checked>
+                    <label class="tab-label" for="tab-6"><span class="word-recipe">Semantic Errors</span> 语义错误</label>
+                    <div class="tab-panel">
+                        <div class="tab-content" id="SemanticErrorDiv">
+                            <table id="SemanticError">
+                            </table>
+                            <script>
+                                SemanticError = SemanticError;
+                                $(document).ready(function () {
+                                    //生成表格内容
+                                    let scrollTable = '';
+                                    scrollTable += '<tr>';
+                                    scrollTable += '<th>No</th>';
+                                    scrollTable += '<th>错误信息</th>';
+                                    scrollTable += '</tr>';
+
+                                    if (SemanticError == 0 ) {
+                                        if(rt=="1" || ra =="1"){
+                                            scrollTable = '';
+                                            scrollTable += '<h2>';
+                                            scrollTable += 'Sorry! Mistakes in Lexical or grammatical analysis!';
+                                            scrollTable += '</h2>';
+                                        }
+                                        else{
+                                            scrollTable = '';
+                                            scrollTable += '<h2>';
+                                            scrollTable += 'Congratulations! No semantic errors!';
+                                            scrollTable += '</h2>';
+                                        }
+                                    }
+                                    else {
+                                        for (let i = 0; i < SemanticError.length; i++) {
+                                            scrollTable += '<tr>';
+                                            scrollTable += `<td nowrap="nowrap">${i}</td>`;
+                                            scrollTable += `<td nowrap="nowrap">${SemanticError[i]}</td>`;
+                                            scrollTable += '</tr>';
+                                        }
+                                        // 捉急的策略, 表格的高度一直固定不了, 为了让表格不过于高, 所以插入几个空行
+                                        scrollTable += `<tr><td nowrap="nowrap"></td><td nowrap="nowrap"></td>`;
+                                        scrollTable += `<tr><td nowrap="nowrap"></td><td nowrap="nowrap"></td>`;
+                                        scrollTable += `<tr><td nowrap="nowrap"></td><td nowrap="nowrap"></td>`;
+                                        scrollTable += `<tr><td nowrap="nowrap"></td><td nowrap="nowrap"></td>`;
+                                        scrollTable += `<tr><td nowrap="nowrap"></td><td nowrap="nowrap"></td>`;
+                                        scrollTable += `<tr><td nowrap="nowrap"></td><td nowrap="nowrap"></td>`;
+                                    }
+                                    $('#SemanticError').html(scrollTable);
+                                    $('#SemanticErrorDiv').on('scroll', function () {
+                                        let top = $(this).scrollTop();
+                                        $('#SemanticErrorDiv').scrollTop(top);
+                                    })
+                                }
+                                )
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+            </div>
+            <div id="resize"></div>
+            <div id="right">
+                <div class="inputBox-header">
+                    <h2 style="text-align: center">Input</h2>
+                </div>
+                <div class="leftCodeBox">
+                    <form id="code" name="CodeSubmit" method="post">
+                        <div class="inputBox-body">
+                            <textarea form="code" id="input" name="inputcode" placeholder="Enter your code here"
+                                rows="10" cols="50" class="codebox">{{ initdata }}</textarea>
+                        </div>
+                        <h3>提交的代码</h3>
+                        <div class="inputBox-body">
+                            <textarea style="height: 30vh" readonly form="code" id="showcode" name="showcode"
+                                placeholder="Enter your code here" rows="10" cols="50"
+                                class="codebox">{{ yourcode }}</textarea>
+                        </div>
+                        <!-- <input type="submit" id="btn" onclick="test()"> -->
+                        <!-- <input type="hidden" onclick="myFunction()" value="开始" class="BigBtn" /> -->
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <input id="readBtn3" type="button" onclick="submitCode()" value="" style="display:none;" />
+                    </form>
+                </div>
+
+                <div class="box">
+                    <input id="doubleBtn3" type="button" value="提交" class="BigBtn">
+                    <input id="doubleBtn" type="button" value="选择文法" class="BigBtn" />
+                    <input id="doubleBtn2" type="button" value="上传" class="BigBtn" />
+                </div>
+                <form action="upload" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input id="readBtn2" type="submit" value="上传" class="BigBtn" style="display:none;" />
+                    <input id="readBtn" type="file" name="file" class="BigBtn" style="display:none;">
+                </form>
+            </div>
+            <script>
+                function submitCode() {
+                    editor.toTextArea();
+                    if (document.getElementById("input").value == "")
+                        alert("请输入内容");
+                    else
+                        CodeSubmit.submit();
+                }
+                $("#doubleBtn").click(function () {
+                    $("#readBtn").click();
+                });
+                $("#doubleBtn2").click(function () {
+                    $("#readBtn2").click();
+                });
+                $("#doubleBtn3").click(function () {
+                    $("#readBtn3").click();
+                });
+            </script>
+            <!-- 代码高亮 -->
+
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("input"), {
+                    lineNumbers: true,
+                    mode: "clike",
+                    theme: "mdn-like"
+                    // extraKeys: { "Ctrl-Space": function (cm) { CodeMirror.simpleHint(cm, CodeMirror.javascriptHint); } }
+                });
+                $(".CodeMirror-scroll").hover(function () {
+                    $(this).get(0).style.cursor = "text";
+                });
+                var editor2 = CodeMirror.fromTextArea(document.getElementById("showcode"), {
+                    lineNumbers: true,
+                    mode: "clike",
+                    theme: "mdn-like"
+                    // extraKeys: { "Ctrl-Space": function (cm) { CodeMirror.simpleHint(cm, CodeMirror.javascriptHint); } }
+                });
+                $(".CodeMirror-scroll").hover(function () {
+                    $(this).get(0).style.cursor = "text";
+                });
+            </script>
+
+            <!-- Upload File -->
+
+            <script>
+
+                /***************针对后端向前端上传文件是否上传成功的信息*****************/
+                var upload_msg = "{{ msg }}";
+                if (upload_msg == '0')
+                    alert("上传成功");
+                else if (upload_msg == '1')
+                    alert("上传失败");
+                /***********************************************************/
+            </script>
+            <script>
+                $('#readBtn').bind('change', function () {
+                    // 获取文件大小和名字
+                    var size = this.files[0].size;
+                    var name = this.files[0].name;
+
+                    // 对大小验证
+                    if (size / 1024 > 1024) {
+                        alert('上传Json超过1M ,请重新选择！');
+                        $('#testFile').val('');
+                        return;
+                    }
+                    // 获取文件扩展名
+                    var ext = this.files[0].name.split('.').pop();
+                    if (ext != 'json') {
+                        alert('上传文件不是json格式 ,请重新选择！');
+                        $('#testFile').val('');
+                        return;
+                    }
+                });
+            </script>
+
+        </div>
+    </div>
+</body>
+
+<script>
+
+    rt=res_token = "{{ res_token }}"
+    ra=res_ana = "{{ res_ana }}"
+    SemanticError == SemanticError
+    if (res_token == "1")
+        window.setTimeout("alert(\"无法通过词法分析，您所输入的程序中'{{ error_token }}'无法识别，请重新输入！\")", 100);
+    else if (res_ana == "1")
+        window.setTimeout("alert(\"无法通过语法分析，请观察parsing Stack最低端您程序触发错误的原因，请重新输入！\")", 100);
+    else if (SemanticError != 0)
+        window.setTimeout("alert(\"无法通过语义分析或有警告，请查看语义分析过程当中的对应错误或警告！\")", 100);
+    else if (res_token == "0" && res_ana == "0")
+        window.setTimeout("alert(\"您的输入结果成功通过词法分析、语法分析与语义分析, 请查看结果！\")", 100);
+    res_token = 0
+    res_ana = 0
+</script>
+
+</html>

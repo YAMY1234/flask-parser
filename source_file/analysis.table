@@ -1,0 +1,4 @@
+步骤	当前栈	输入串	动作	状态栈	ACTION	GOTO	
+1	# external_declaration		reduce(external_declaration->$ ,['#'])	I0 I2	r24	I2	
+2	# start		reduce(start->external_declaration ,['#'])	I0 I1	r34	I1	
+3	# start		accept	I0 I1	acc		

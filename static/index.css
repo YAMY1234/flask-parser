@@ -1,0 +1,651 @@
+/* Node and Link Style */
+
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+
+/* Tooltip Style */
+
+.chartTooltip {
+  position: absolute;
+  width: 200px;
+  height: auto;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.chartTooltip.hidden {
+  display: none;
+}
+
+.chartTooltip p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  word-wrap: break-word;
+}
+
+
+
+/* //////////////////////////////////////////////////////// */
+/* Columns */
+/* //////////////////////////////////////////////////////// */
+
+
+#container {
+  width: 100%;
+  height: 100vh;
+  /* display: flex; */
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+#left {
+  /* width: calc(65% - 4px); */
+  background-color:rgb(206, 206, 206);
+  /*border-color: #009674;*/
+  background: rgb(87,141,191);
+  display: flex;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+#resize {
+  width: 4px;
+  height: 90vh;
+  /* cursor: ew-resize; */
+}
+/* #resize:hover {
+  background-color: blue;
+} */
+
+
+textarea {
+  width: 98%;
+  /*height: 80vh;*/
+  height: 39vh;
+}
+
+
+/* //////////////////////////////////////////////////////// */
+/* Tab Effect Start */
+/* //////////////////////////////////////////////////////// */
+
+@import url('https://fonts.googleapis.com/css?family=Lobster');
+
+body{
+color: #444444;
+/*background: #009674;*/
+  /* background: rgb(87,141,191); */
+  background: rgb(248 248 248);
+}
+
+
+h1{
+font-size: 56px;
+font-weight: 400;
+font-family: 'Lobster', cursive;
+color: #ffffff;
+text-shadow: 0 2px #7d7d7d;
+}
+
+h3{
+  font-size: 1.1em;
+  /* font-weight: 400; */
+  text-align: center;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  font-weight: bold;
+  font-family: 'Lobster', cursive;
+  /* text-shadow: 0 2px #7d7d7d; */
+  }
+
+.recipe-tab {
+font-family: 'Lobster', cursive;
+text-align: center;
+list-style: none;
+margin: 50px 0 0;
+font-size: 24px;
+padding: 0;
+line-height: 24px;
+overflow: hidden;
+position: relative;
+
+}
+.recipe-tab li {
+/* border: 3px solid #009674; */
+padding: 10px 28px 8px;
+background-color: #FFF;
+margin-right: 5px;
+display: inline-block;
+position: relative;
+z-index: 0;
+  background: rgb(87,141,191);
+/*color: #009674;*/
+}
+/*.recipe-tab a {
+color: #009674;;
+text-decoration: none;
+}*/
+.recipe-tab li.selected {
+background: #FFF;
+z-index: 2;
+border-bottom-color: #FFF;
+}
+
+.recipe-content{
+/* border-color: #009674; */
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+background: #ffffff;
+width: 60%;
+margin: 0 auto;
+padding: 50px;
+}
+
+.recipe-tab li:before,
+.recipe-tab li:after {
+display: block;
+content: " ";
+position: absolute;
+top: 0;
+height: 100%;
+width: 44px;  
+background-color: #FFF;
+
+}
+.recipe-tab li:before {
+left: -24px;
+
+transform: skew(-25deg, 0deg);
+/* border-left: 3px solid #009674; */
+}
+.recipe-tab li:after {
+right: -24px;
+transform: skew(25deg, 0deg);
+/* border-right: 3px solid #009674; */
+}
+
+.recipe-tab li:before {
+border-radius: 8px 0 0 0;
+}
+.recipe-tab li:after {
+border-radius: 0 8px 0 0;
+}
+
+.recipe-tab li.selected:before,
+.recipe-tab li.selected:after{
+background: #FFF;
+border-bottom: 3px solid #ffffff;
+}
+
+.recipe-tab li:hover,
+.recipe-tab li:hover:before,
+.recipe-tab li:hover:after {
+/* background-color: #009674; */
+color: white;
+cursor: pointer;
+/* border-bottom-color: #009674; */
+}
+.tabs{
+width: 75%;
+margin: 0 auto;
+text-align: center;
+}
+
+.tabs:after {
+clear: both;
+content: '';
+display: table;
+}
+
+.tabs .tab {
+display: inline;
+
+
+}
+
+.tabs .tab-label {
+font-size: 18px;
+vertical-align: bottom;
+font-family: 'Lobster', cursive;
+/* border: 3px solid #cecece; */
+padding: 15px 22px 8px;
+background-color: #FFF;
+margin-right: -9px;
+display: inline-block;
+position: relative;
+z-index: 0;
+color: rgb(87,141,191);
+}
+
+.tabs .tab-label:before,
+.tabs .tab-label:after {
+display: block;
+content: " ";
+position: absolute;
+top: 0;
+height: 100%;
+width: 33px;  
+background-color: #FFF;
+}
+.tabs .tab-label:before {
+left: -17px;
+transform: skew(-25deg, 0deg);
+border-left: 3px solid rgb(87,141,191);
+}
+.tabs .tab-label:after {
+right: -17px;
+transform: skew(25deg, 0deg);
+border-right: 3px solid rgb(87,141,191);
+}
+
+.tabs .tab-label:before {
+border-radius: 8px 0 0 0;
+}
+.tabs .tab-label:after {
+border-radius: 0 8px 0 0;
+}
+
+.recipe-tab li.selected:before,
+.recipe-tab li.selected:after{
+background: #FFF;
+border-bottom: 3px solid #ffffff;
+}
+
+.tabs .tab [type="radio"]:hover:checked + .tab-label,
+.tabs .tab-label:hover,
+.tabs .tab-label:hover:before,
+.tabs .tab-label:hover:after {
+background-color: rgb(87,141,191);
+color: white;
+cursor: pointer;
+/* border-bottom-color: #009674; */
+}
+
+.tabs .tab > [type="radio"] {
+clip: rect(0 0 0 0);
+height: 1px;
+opacity: 0;
+position: fixed;
+width: 1px;
+z-index: -1;
+}
+
+.tabs .tab-panel {
+display: inline;
+display: inline-block;
+overflow: hidden;
+position: relative;
+height: 0;
+width: 0;
+}
+
+.tabs .tab-content {
+  /* border-color: #009674; */
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+display: block;
+background: white;
+border-radius: 15px;
+padding: 50px;
+float: left;
+width: 100%;
+text-align: left;
+width: 100%;
+height: 88vh;
+overflow: auto;
+
+}
+
+.tabs .tab-content h2{
+text-align: center;
+margin-bottom:45px;
+}
+
+.tabs .tab [type="radio"]:checked + .tab-label {
+background: white;
+border-bottom-width: 0;
+padding-bottom: 11px;
+z-index: 1;
+}
+
+.tabs .tab .tab-label .word-recipe{
+display:none;
+}
+
+.tabs .tab [type="radio"]:checked + .tab-label .word-recipe{
+display:inline;
+}
+
+.tabs .tab [type="radio"]:checked ~ .tab-panel {
+display: inline;
+}
+
+
+/* Tab effect ends */
+
+
+/* Table Starts */
+
+/* Table */
+.table-wrapper {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+}
+
+table {
+  margin: 0 0 0.3em 0;
+  width: 100%;
+  /* height: 20vh; */
+  width: 100%;
+  height: 80vh;
+  overflow: auto;
+}
+table tbody tr {
+  border: solid 1px rgba(210, 215, 217, 0.75);
+  border-left: 0;
+  border-right: 0;
+}
+table tbody tr:nth-child(2n + 1) {
+  background-color: rgba(230, 235, 237, 0.25);
+}
+table td {
+  padding: 0.25em 0.7em;
+  height: 12px;
+}
+table th {
+  color: #3d4449;
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 0 0.75em 0.75em 0.75em;
+  text-align: left;
+  height: 12px;
+}
+table thead {
+  border-bottom: solid 2px rgba(210, 215, 217, 0.75);
+}
+table tfoot {
+  border-top: solid 2px rgba(210, 215, 217, 0.75);
+}
+table.alt {
+  border-collapse: separate;
+}
+table.alt tbody tr td {
+  border: solid 1px rgba(210, 215, 217, 0.75);
+  border-left-width: 0;
+  border-top-width: 0;
+}
+table.alt tbody tr td:first-child {
+  border-left-width: 1px;
+}
+table.alt tbody tr:first-child td {
+  border-top-width: 1px;
+}
+table.alt thead {
+  border-bottom: 0;
+}
+table.alt tfoot {
+  border-top: 0;
+}
+
+
+/* Table ends */
+
+
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+button,
+.button {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  -moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  -webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  -ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  background-color: transparent;
+  border-radius: 0.375em;
+  border: 0;
+  /* box-shadow: inset 0 0 0 2px rgb(87,141,191) ; */
+  /* color: rgb(87,141,191) !important; */
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Roboto Slab", serif;
+  font-size: 1em;
+  font-weight: 700;
+  height: 3.5em;
+  letter-spacing: .275em;
+  line-height: 3.5em;
+  padding: 0 1.5em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* background-color: #f56a6a; */
+  background-color: #ffffff;
+  /* background-color: rgb(87,141,191); */
+  box-shadow: none;
+  /* color: #ffffff !important; */
+  color: rgb(87,141,191) !important;
+  /* padding-right: 22.75em; */
+  
+}
+
+
+textarea {
+  color: #7f888f;
+  font-family: "Open Sans", sans-serif;
+  font-size: 13pt;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+input[type="url"],
+select,
+textarea {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: #ffffff;
+  border-radius: 0.375em;
+  border: none;
+  border: solid 1px rgba(210, 215, 217, 0.75);
+  color: inherit;
+  display: block;
+  outline: 0;
+  padding: 0 1em;
+  text-decoration: none;
+  width: 92%;
+}
+input[type="text"]:invalid,
+input[type="password"]:invalid,
+input[type="email"]:invalid,
+input[type="tel"]:invalid,
+input[type="search"]:invalid,
+input[type="url"]:invalid,
+select:invalid,
+textarea:invalid {
+  box-shadow: none;
+}
+
+
+.box{
+  padding: 13px;
+}
+
+.BigBtn{
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  -moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  -webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  -ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  background-color: transparent;
+  border-radius: 0.375em;
+  border: 0;
+  box-shadow: inset 0 0 0 2px rgb(87,141,191) ;
+  color: rgb(87,141,191) !important;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Roboto Slab", serif;
+  font-size: 1em;
+  font-weight: 700;
+  height: 3.5em;
+  letter-spacing: .275em;
+  line-height: 3.5em;
+  padding: 0 1.5em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  
+  white-space: nowrap;
+  /* background-color: #f56a6a; */
+  background-color: rgb(87,141,191);
+  box-shadow: none;
+
+  /* color: #ffffff !important; */
+  /* padding-right: 22.75em; */
+  
+}
+
+#right {
+  width: 40%;
+  height: 95vh;
+  /* background-color:rgb(206, 206, 206); */
+  /* display: flex; */
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+.leftCodeBox{
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  background: #f8f8f8;
+  border-radius: 15px;
+  padding: 0 16px;
+  /* float: left; */
+  /* width: 100%; */
+  /* text-align: left; */
+  /* width: 100%; */
+  height: 78vh;
+  /* overflow: auto; */
+}
+
+.inputBox-header{
+  color: rgb(248 248 248);
+font-family: 'Lobster', cursive;
+}
+
+.inputBox-body{
+  height: 39vh;
+}
+
+
+
+
+
+
+
+
+
+
+/* ErrorTable Starts */
+
+/* Table */
+.table-wrapper {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+}
+
+table {
+  margin: 0 0 0.3em 0;
+  width: 100%;
+  /* height: 20vh; */
+  width: 100%;
+  height: 80vh;
+  overflow: auto;
+}
+table tbody tr {
+  border: solid 1px rgba(210, 215, 217, 0.75);
+  border-left: 0;
+  border-right: 0;
+}
+table tbody tr:nth-child(2n + 1) {
+  background-color: rgba(230, 235, 237, 0.25);
+}
+table td {
+  padding: 0.25em 0.7em;
+  max-height : 10px;
+}
+table th {
+  color: #3d4449;
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 0 0.75em 0.75em 0.75em;
+  text-align: left;
+}
+table thead {
+  border-bottom: solid 2px rgba(210, 215, 217, 0.75);
+}
+table tfoot {
+  border-top: solid 2px rgba(210, 215, 217, 0.75);
+}
+table.alt {
+  border-collapse: separate;
+}
+table.alt tbody tr td {
+  border: solid 1px rgba(210, 215, 217, 0.75);
+  border-left-width: 0;
+  border-top-width: 0;
+}
+table.alt tbody tr td:first-child {
+  border-left-width: 1px;
+}
+table.alt tbody tr:first-child td {
+  border-top-width: 1px;
+}
+table.alt thead {
+  border-bottom: 0;
+}
+table.alt tfoot {
+  border-top: 0;
+}
+
+
+/* ErrorTable ends */
